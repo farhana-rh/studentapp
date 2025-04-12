@@ -99,7 +99,10 @@
                                 data-bs-toggle="modal" data-bs-target="#editModal">
                                 <i class="fas fa-edit me-1"></i> Edit
                             </button>
-                            <button class="btn btn-outline-danger">
+                            
+                            <button type="button" class="btn btn-outline-danger delete-btn"
+                                    data-id="<?php echo $data['id'] ?>"
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal">
                                 <i class="fas fa-trash-alt me-1"></i> Delete
                             </button>
                         </div>
@@ -192,6 +195,26 @@
         </div>
     </div>
 
+    <!-- delete modal -->
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="modal-content" action="process.php" method="post">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this course?
+                <input type="hidden" name="delete_id" id="deleteCourseId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" name="delete" class="btn btn-outline-danger">Delete</button>
+            </div>
+            </form>
+        </div>
+    </div>
     <script>
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -201,6 +224,13 @@
                 document.getElementById('editCreditHours').value = btn.dataset.hours;
                 document.getElementById('editInstructorName').value = btn.dataset.instructor;
                 document.getElementById('editInstructorEmail').value = btn.dataset.email;
+            });
+        });
+
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+            document.getElementById('deleteCourseId').value = btn.dataset.id;
             });
         });
     </script>

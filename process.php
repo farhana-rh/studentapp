@@ -49,4 +49,17 @@ if (isset($_POST["edit"])) {
         die("Something went wrong: " . mysqli_error($conn));
     }
 }
+
+
+if (isset($_POST['delete'])) {
+    include('database.php');
+    $course_id = mysqli_real_escape_string($conn, $_POST['delete_id']);
+
+    $sqlDelete = "DELETE FROM courses WHERE id = $course_id";
+    if (mysqli_query($conn, $sqlDelete)) {
+        header("Location: dashboard.php");
+    } else {
+        echo "Error deleting course: " . mysqli_error($conn);
+    }
+}
 ?> 
