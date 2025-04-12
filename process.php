@@ -19,7 +19,7 @@ if (isset($_POST["create"])) {
                   VALUES ($user_id, '$course_code', '$course_name', $credit_hours, '$instructor_name', '$instructor_email')";
 
     if (mysqli_query($conn, $sqlInsert)) {
-        echo "Record inserted";
+        header("Location: dashboard.php");
     } else {
         die("Something went wrong: " . mysqli_error($conn));
     }
@@ -44,7 +44,7 @@ if (isset($_POST["edit"])) {
               WHERE id = $course_id AND user_id = $user_id";
 
     if (mysqli_query($conn, $sqlUpdate)) {
-        echo "Record inserted";
+        header("Location: dashboard.php");
     } else {
         die("Something went wrong: " . mysqli_error($conn));
     }

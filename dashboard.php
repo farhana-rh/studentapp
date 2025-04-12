@@ -37,7 +37,9 @@
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link active" href="#">Courses</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Grades</a></li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="<?php echo "notes.php" ?>">Notes</a>
+                        </li>
                 </ul>
                 <div class="ms-auto">
                     <span class="navbar-text text-white me-3">
@@ -74,7 +76,8 @@
             <div class="col-md-6 col-lg-4">
                 <div class="card course-card h-100">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><?php echo $data['id'] ?></h5>
+                        <!-- <h5 class="mb-0"> /* <?php echo $data['id'] ?> */</h5> -->
+                        <h6 class="mb-0">Credit Hours:</h6>
                         <span class="badge bg-primary"><?php echo $data['credit_hours'] ?></span>
                     </div>
                     <div class="card-body">
