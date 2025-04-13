@@ -1,8 +1,12 @@
 <?php
-    session_start();
+   session_start();
+   if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
    include('database.php');
    $user_id = $_SESSION["user"]["id"];
-$course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
+   $course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
 
 // Get course details (for heading)
 $courseInfo = null;

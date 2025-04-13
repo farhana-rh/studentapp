@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -67,7 +76,7 @@
 
         <div class="row g-4" id="courseContainer">
             <?php
-            session_start();
+            // session_start();
             include('database.php');
             $user_id = $_SESSION["user"]["id"];
             $sqlSelect = "SELECT * FROM courses WHERE user_id = $user_id";
