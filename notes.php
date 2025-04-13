@@ -121,9 +121,7 @@
                 <div class="col-lg-3 col-md-4 p-0">
                     <div class="sidebar bg-light p-3">
                         <h5 class="mb-3">My Courses</h5>
-                        <?php
-                   
-                         
+                        <?php                         
                         $user_id = $_SESSION["user"]["id"];
                         $sqlSelect = "SELECT * FROM courses WHERE user_id = $user_id";
                         //  $sqlSelect = "SELECT * FROM courses";
@@ -131,9 +129,10 @@
                         while($course = mysqli_fetch_array($result)) {
                         ?> 
                         <div class="list-group mb-4">
-                            <a href="#" class="list-group-item list-group-item-action active d-flex align-items-center">
+                            <a href="#" class="list-group-item list-group-item-action  d-flex align-items-center">
                                 <div>
-                                    <div class="small"><?php echo htmlspecialchars($course['course_name']); ?>
+                                    <strong><?php echo htmlspecialchars($course['course_name']); ?> </strong>
+                                    <div class="small"><?php echo htmlspecialchars($course['course_code']); ?>
                                 </div>
                                 </div>
                             </a>  
@@ -174,59 +173,54 @@
                             <h3>CS101 Notes</h3>
                             <p class="text-muted">Introduction to Computer Science</p>
                         </div>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                data-bs-toggle="dropdown">
-                                <i class="fas fa-filter me-1"></i> Filter
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">All Notes</a></li>
-                                <li><a class="dropdown-item" href="#">Recent First</a></li>
-                                <li><a class="dropdown-item" href="#">Oldest First</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="#">Lectures Only</a></li>
-                                <li><a class="dropdown-item" href="#">Assignments Only</a></li>
-                                <li><a class="dropdown-item" href="#">Topics Only</a></li>
-                            </ul>
-                        </div>
+                        
                     </div>
 
                     <div class="row g-4">
-                        <!-- Note Card 1 -->
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card note-card">
-                                <div class="card-body">
-                                    <span class="badge bg-info category-badge">Lecture</span>
-                                    <h5 class="card-title">Introduction to Algorithms</h5>
-                                    <p class="note-date"><i class="far fa-calendar-alt me-1"></i> March 2, 2025</p>
-                                    <p class="card-text note-preview">Algorithm analysis is the determination of the
-                                        computational complexity of algorithms, that is the amount of time, storage
-                                        and/or other resources necessary to execute them...</p>
-                                </div>
-                                <div class="card-footer bg-white border-top-0">
-                                    <div class="d-flex justify-content-between">
-                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1"></i>
-                                            Edit</button>
-                                        <div>                                           
-                                            <button class="btn btn-sm btn-outline-danger"><i
-                                                    class="fas fa-trash"></i></button>
+                        <?php
+                        
+                        $user_id = $_SESSION["user"]["id"];
+
+                        $sqlSelect = "SELECT notes.*, courses.course_code, courses.course_name 
+                                    FROM notes 
+                                    JOIN courses ON notes.course_id = courses.id 
+                                    WHERE notes.user_id = $user_id 
+                                    ORDER BY notes.created_at DESC";
+
+                        $result = mysqli_query($conn, $sqlSelect);
+
+                        while($note = mysqli_fetch_assoc($result)) {
+                        ?>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card note-card">
+                                    <div class="card-body">
+                                        <span class="badge bg-info category-badge">
+                                            <?php echo ucfirst($note['note_type']); ?>
+                                        </span>
+                                        <h5 class="card-title"><?php echo htmlspecialchars($note['title']); ?></h5>
+                                        <p class="note-date">
+                                            <i class="far fa-calendar-alt me-1"></i> 
+                                            <?php echo date("F j, Y", strtotime($note['created_at'])); ?>
+                                        </p>
+                                        <p class="card-text note-preview">
+                                            <?php echo nl2br(htmlspecialchars(substr($note['content'], 0, 150))) . '...'; ?>
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-white border-top-0">
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i> Edit
+                                            </button>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        
-
-                     
-
-                      
-
-                       
-
-                       
+                        <?php } ?>
                     </div>
 
                     <!-- Pagination -->
@@ -261,16 +255,16 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form action="notes_process.php" method="post">
                             <div class="row mb-3">
                                 <div class="col-md-8">
                                     <label for="noteTitle" class="form-label">Note Title</label>
-                                    <input type="text" class="form-control" id="noteTitle"
+                                    <input type="text" name="title" class="form-control" id="noteTitle"
                                         placeholder="Enter note title" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="noteCategory" class="form-label">Category</label>
-                                    <select class="form-select" id="noteCategory" required>
+                                    <select class="form-select" name="note_type"  id="noteCategory" required>
                                         <option value="">Select category</option>
                                         <option value="lecture">Lecture</option>
                                         <option value="assignment">Assignment</option>
@@ -282,12 +276,17 @@
 
                             <div class="mb-3">
                                 <label for="noteCourse" class="form-label">Course</label>
-                                <select class="form-select" id="noteCourse" required>
-                                    <option value="">Select course</option>
-                                    <option value="cs101" selected>CS101 - Introduction to Computer Science</option>
-                                    <option value="math201">MATH201 - Calculus I</option>
-                                    <option value="eng105">ENG105 - English Composition</option>
-                                    <option value="phys102">PHYS102 - Introduction to Physics</option>
+                                <select class="form-select" name="course_id" id="noteCourse" required>
+                                    <!-- <option value="">Select course</option>
+                                    <option value="cs101" selected>CS101 - Introduction to Computer Science</option> -->
+                                    <?php
+                                    $user_id = $_SESSION['user']['id'];
+                                    $courseQuery = "SELECT * FROM courses WHERE user_id = $user_id";
+                                    $courseResult = mysqli_query($conn, $courseQuery);
+                                    while($row = mysqli_fetch_assoc($courseResult)) {
+                                        echo "<option value='{$row['id']}'>{$row['course_code']} - {$row['course_name']}</option>";
+                                    }
+                                    ?>
                                 </select>
                             </div>
 
@@ -317,28 +316,17 @@
                                                 class="fas fa-code"></i></button>
                                     </div>
                                 </div>
-                                <textarea class="form-control" id="noteContent" rows="10"
+                                <textarea class="form-control" name="content" id="noteContent" rows="10"
                                     placeholder="Write your notes here..." required></textarea>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="noteTags" class="form-label">Tags (Optional)</label>
-                                    <input type="text" class="form-control" id="noteTags"
-                                        placeholder="algorithms, data structures">
-                                    <div class="form-text">Separate tags with commas</div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="noteAttachment" class="form-label">Attachments (Optional)</label>
-                                    <input class="form-control" type="file" id="noteAttachment">
-                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Note</button>
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary">Save Note</button>
-                    </div>
+                    
                 </div>
             </div>
         </div>
