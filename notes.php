@@ -208,13 +208,24 @@
                                     </div>
                                     <div class="card-footer bg-white border-top-0">
                                         <div class="d-flex justify-content-between">
-                                            <button class="btn btn-sm btn-outline-primary">
+                                      
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editNoteModal"
+                                                    data-id="<?php echo $note['id']; ?>"
+                                                    data-title="<?php echo $note['title']; ?>"
+                                                    data-category="<?php echo $note['note_type']; ?>"
+                                                    data-course="<?php echo $note['course_id']; ?>"
+                                                    data-content="<?php echo htmlspecialchars($note['content']); ?>">
                                                 <i class="fas fa-edit me-1"></i> Edit
                                             </button>
                                             <div>
-                                                <button class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteNoteModal"
+                                                    data-id="<?php echo $note['id']; ?>">
+                                                <i class="fas fa-trash-alt me-1"></i> Delete
+                                            </button>
                                             </div>
                                         </div>
                                     </div>
@@ -322,7 +333,7 @@
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Note</button>
+                                <button type="submit" name="add_note"  class="btn btn-primary">Save Note</button>
                             </div>
                         </form>
                     </div>
@@ -330,9 +341,127 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- Edit Note Modal -->
+
+        <div class="modal fade" id="editNoteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Note</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="notes_process.php" method="post">
+                            <input type="hidden" name="note_id" id="noteId">
+                            <div class="row mb-3">
+                            <div class="col-md-8">
+                                        <label for="noteTitle" class="form-label">Note Title</label>
+                                        <input type="text" name="title" class="form-control" id="noteTitle"
+                                            placeholder="Enter note title" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="noteCategory" class="form-label">Category</label>
+                                        <select class="form-select" name="note_type"  id="noteCategory" required>
+                                            <option value="">Select category</option>
+                                            <option value="lecture">Lecture</option>
+                                            <option value="assignment">Assignment</option>
+                                            <option value="topic">Topic</option>
+                                            <option value="exam">Exam Prep</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="noteCourse" class="form-label">Course</label>
+                                    <select class="form-select" name="course_id" id="noteCourse" required>
+                                        <!-- <option value="">Select course</option>
+                                        <option value="cs101" selected>CS101 - Introduction to Computer Science</option> -->
+                                        <?php
+                                        $user_id = $_SESSION['user']['id'];
+                                        $courseQuery = "SELECT * FROM courses WHERE user_id = $user_id";
+                                        $courseResult = mysqli_query($conn, $courseQuery);
+                                        while($row = mysqli_fetch_assoc($courseResult)) {
+                                            echo "<option value='{$row['id']}'>{$row['course_code']} - {$row['course_name']}</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="noteContent" class="form-label">Note Content</label>
+                                    
+                                    <textarea class="form-control" name="content" id="noteContent" rows="10"
+                                        placeholder="Write your notes here..." required></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" name="update" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Note Modal -->
+
+
+        <div class="modal fade" id="deleteNoteModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="notes_process.php" method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Note</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="delete_note_id" id="deleteNoteId">
+                            <p>Are you sure you want to delete this note? This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" name="delete_note" class="btn btn-danger">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
+            <script>
+   document.addEventListener('DOMContentLoaded', function () {
+    const editButtons = document.querySelectorAll('[data-bs-target="#editNoteModal"]');
+    
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const noteId = this.getAttribute('data-id');
+            const noteTitle = this.getAttribute('data-title');
+            const noteCategory = this.getAttribute('data-category');
+            const noteCourse = this.getAttribute('data-course');
+            const noteContent = this.getAttribute('data-content');
+            
+            const editForm = document.querySelector('#editNoteModal form');
+            editForm.querySelector('#noteId').value = noteId;
+            editForm.querySelector('#noteTitle').value = noteTitle;
+            editForm.querySelector('#noteCategory').value = noteCategory;
+            editForm.querySelector('#noteCourse').value = noteCourse;
+            editForm.querySelector('#noteContent').value = noteContent;
+        });
+    });
+});
+    // Attach note ID to delete modal
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.getElementById('deleteNoteId').value = btn.dataset.id;
+    });
+});
+</script>
+
     </body>
 
 </html>
