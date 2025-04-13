@@ -28,15 +28,15 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="#">Student Portal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link active" href="#">Courses</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                    
+                   
                     <li class="nav-item">
                             <a class="nav-link" href="<?php echo "notes.php" ?>">Notes</a>
                         </li>
@@ -45,11 +45,12 @@
                     <span class="navbar-text text-white me-3">
                         <i class="fas fa-user-circle me-1"></i> John Doe
                     </span>
-                    <button class="btn btn-outline-light btn-sm">Logout</button>
+                    <button class="btn btn-light btn-sm"><a href="logout.php">Logout</a></button>
                 </div>
             </div>
         </div>
     </nav>
+    
 
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">

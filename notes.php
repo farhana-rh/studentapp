@@ -1,6 +1,30 @@
 <?php
     session_start();
    include('database.php');
+   $user_id = $_SESSION["user"]["id"];
+$course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
+
+// Get course details (for heading)
+$courseInfo = null;
+if ($course_id) {
+    $courseQuery = "SELECT * FROM courses WHERE id = $course_id AND user_id = $user_id";
+    $courseResult = mysqli_query($conn, $courseQuery);
+    $courseInfo = mysqli_fetch_assoc($courseResult);
+}
+
+// Notes query
+$sqlSelect = "SELECT notes.*, courses.course_code, courses.course_name 
+              FROM notes 
+              JOIN courses ON notes.course_id = courses.id 
+              WHERE notes.user_id = $user_id";
+
+if ($course_id) {
+    $sqlSelect .= " AND notes.course_id = $course_id";
+}
+
+$sqlSelect .= " ORDER BY notes.created_at DESC";
+
+$result = mysqli_query($conn, $sqlSelect);
 ?>
 <!doctype html>
 <html lang="en">
@@ -83,32 +107,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo "dashboard.php" ?>">Dashboard</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Courses</a>
-                        </li>
+                       
                     </ul>
                     <div class="ms-auto d-flex align-items-center">
-                        <div class="input-group me-3">
-                            <input type="text" class="form-control" placeholder="Search notes...">
-                            <button class="btn btn-light" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-light dropdown-toggle" type="button"
-                                data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i> John Doe
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
-                                </li>
-                            </ul>
-                        </div>
+                       
+                    <button class="btn btn-light btn-sm"><a href="logout.php">Logout</a></button>
                     </div>
                 </div>
             </div>
@@ -126,10 +129,14 @@
                         $sqlSelect = "SELECT * FROM courses WHERE user_id = $user_id";
                         //  $sqlSelect = "SELECT * FROM courses";
                         $result = mysqli_query($conn, $sqlSelect);
+
+
+                        
+                    
                         while($course = mysqli_fetch_array($result)) {
                         ?> 
                         <div class="list-group mb-4">
-                            <a href="#" class="list-group-item list-group-item-action  d-flex align-items-center">
+                            <a href="notes.php?course_id=<?php echo $course['id']; ?>" class="list-group-item list-group-item-action  d-flex align-items-center">
                                 <div>
                                     <strong><?php echo htmlspecialchars($course['course_name']); ?> </strong>
                                     <div class="small"><?php echo htmlspecialchars($course['course_code']); ?>
@@ -168,26 +175,65 @@
 
                 <!-- Main Content -->
                 <div class="col-lg-9 col-md-8 py-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h3>CS101 Notes</h3>
                             <p class="text-muted">Introduction to Computer Science</p>
                         </div>
                         
-                    </div>
-
+                    </div> -->
+                    <?php if ($courseInfo): ?>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h3><?php echo htmlspecialchars($courseInfo['course_code']); ?> Notes</h3>
+                                <p class="text-muted"><?php echo htmlspecialchars($courseInfo['course_name']); ?></p>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="mb-4">
+                            <h3>All Notes</h3>
+                            <p class="text-muted">Select a course to filter notes.</p>
+                        </div>
+                    <?php endif; ?>
                     <div class="row g-4">
                         <?php
                         
-                        $user_id = $_SESSION["user"]["id"];
+                        // $user_id = $_SESSION["user"]["id"];
 
-                        $sqlSelect = "SELECT notes.*, courses.course_code, courses.course_name 
-                                    FROM notes 
-                                    JOIN courses ON notes.course_id = courses.id 
-                                    WHERE notes.user_id = $user_id 
-                                    ORDER BY notes.created_at DESC";
+                        // $sqlSelect = "SELECT notes.*, courses.course_code, courses.course_name 
+                        //             FROM notes 
+                        //             JOIN courses ON notes.course_id = courses.id 
+                        //             WHERE notes.user_id = $user_id 
+                        //             ORDER BY notes.created_at DESC";
+                        // $result = mysqli_query($conn, $sqlSelect);
+                        // filtering code:
 
-                        $result = mysqli_query($conn, $sqlSelect);
+             
+                    // $user_id = $_SESSION["user"]["id"];
+                    // $course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
+
+                    // // Get course details (for heading)
+                    // $courseInfo = null;
+                    // if ($course_id) {
+                    //     $courseQuery = "SELECT * FROM courses WHERE id = $course_id AND user_id = $user_id";
+                    //     $courseResult = mysqli_query($conn, $courseQuery);
+                    //     $courseInfo = mysqli_fetch_assoc($courseResult);
+                    // }
+
+                    // Notes query
+                    $sqlSelect = "SELECT notes.*, courses.course_code, courses.course_name 
+                                FROM notes 
+                                JOIN courses ON notes.course_id = courses.id 
+                                WHERE notes.user_id = $user_id";
+
+                    if ($course_id) {
+                        $sqlSelect .= " AND notes.course_id = $course_id";
+                    }
+
+                    $sqlSelect .= " ORDER BY notes.created_at DESC";
+
+                    $result = mysqli_query($conn, $sqlSelect);
+                        
 
                         while($note = mysqli_fetch_assoc($result)) {
                         ?>
@@ -234,19 +280,7 @@
                         <?php } ?>
                     </div>
 
-                    <!-- Pagination -->
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+                  
                 </div>
             </div>
         </div>
